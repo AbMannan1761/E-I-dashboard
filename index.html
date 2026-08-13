@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E&I Directorate – BTRC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter','Hind Siliguri',sans-serif; background: #f1f5f9; color: #1e293b; }
+
+    header {
+      background: #006a4e; color: #fff;
+      padding: 0 1.5rem; display: flex; align-items: center; gap: 1rem;
+      height: 60px; position: sticky; top: 0; z-index: 99;
+      box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    }
+    header i { font-size: 1.3rem; opacity: .9; }
+    header h1 { font-size: .95rem; font-weight: 600; line-height: 1.3; }
+    header span { font-size: .72rem; opacity: .75; display: block; }
+    .hrt { margin-left: auto; font-size: .72rem; opacity: .7; }
+
+    .search-wrap { max-width: 680px; margin: 1.5rem auto; padding: 0 1rem; }
+    .search-wrap input {
+      width: 100%; padding: .7rem 1rem .7rem 2.5rem;
+      border: 1.5px solid #cbd5e1; border-radius: 8px;
+      font-size: .88rem; font-family: inherit; outline: none; background: #fff;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.415l-3.868-3.833zm-5.242 1.156a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: .75rem center;
+    }
+    .search-wrap input:focus { border-color: #006a4e; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 0 1rem 3rem; }
+
+    .section { margin-bottom: 2rem; }
+    .sec-head {
+      display: flex; align-items: center; gap: .6rem;
+      margin-bottom: .75rem; padding-bottom: .45rem;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .sec-head i { color: #006a4e; width: 18px; text-align: center; }
+    .sec-head h2 { font-size: .88rem; font-weight: 700; }
+    .sec-head small { font-size: .7rem; color: #94a3b8; margin-left: 4px; }
+
+    .grid {
+      display: flex; flex-wrap: wrap; gap: .65rem;
+    }
+
+    .card {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
+      padding: .85rem 1rem; text-decoration: none; color: inherit;
+      display: flex; align-items: center; gap: .75rem;
+      transition: border-color .18s, box-shadow .18s;
+      flex: 1 1 240px;
+    }
+    .card:hover { border-color: #006a4e; box-shadow: 0 2px 10px rgba(0,106,78,.12); }
+    .card-ico {
+      width: 38px; height: 38px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .95rem; color: #fff; flex-shrink: 0;
+    }
+    .card-text { flex: 1; min-width: 0; }
+    .card-title { font-size: .84rem; font-weight: 600; line-height: 1.35; }
+    .card-sub { font-size: .7rem; color: #94a3b8; margin-top: 2px; }
+    .tag { font-size: .6rem; font-weight: 600; padding: 2px 7px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }
+
+    .c-navy  { background: #1e3a6e; }
+    .c-cyan  { background: #0891b2; }
+    .c-red   { background: #dc2626; }
+    .c-green { background: #006a4e; }
+
+    .t-bl { background: #dbeafe; color: #1d4ed8; }
+    .t-tl { background: #ccfbf1; color: #115e59; }
+    .t-rd { background: #fee2e2; color: #991b1b; }
+    .t-gy { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .t-gn { background: #dcfce7; color: #166534; }
+
+    footer { text-align: center; padding: 1.2rem; font-size: .72rem; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #fff; margin-top: 1rem; }
+
+    @media(max-width:500px){ .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <i class="fas fa-shield-halved"></i>
+  <div>
+    <h1>এনফোর্সমেন্ট এন্ড ইন্সপেকশন ডিরেক্টরেট</h1>
+    <span>Bangladesh Telecommunication Regulatory Commission (BTRC)</span>
+  </div>
+  <div class="hrt"><i class="fas fa-clock"></i> রবি–বৃহস্পতি | ৯টা–৫টা</div>
+</header>
+
+<div class="search-wrap">
+  <input type="text" id="q" placeholder="লিংক খুঁজুন..." oninput="filter()" />
+</div>
+
+<main>
+
+  <!-- Commission Meeting -->
+  <div class="section">
+    <div class="sec-head">
+      <i class="fas fa-landmark"></i>
+      <h2>কমিশন সভা ও সিদ্ধান্ত</h2>
+      <small>Commission Meeting &amp; Decisions</small>
+    </div>
+    <div class="grid">
+      <a href="https://abmannan1761.github.io/btrc-meeting-portal/" target="_blank" class="card" data-t="কমিশন সভার কার্যবিবরণী পোর্টাল">
+        <div class="card-ico c-navy"><i class="fas fa-landmark"></i></div>
+        <div class="card-text">
+          <div class="card-title">কমিশন সভার কার্যবিবরণী</div>
+          <div class="card-sub">Meeting minutes &amp; decisions portal</div>
+        </div>
+        <span class="tag t-bl">Portal</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Enforcement -->
+  <div class="section">
+    <div class="sec-head">
+      <i class="fas fa-gavel"></i>
+      <h2>এনফোর্সমেন্ট ও ডেটাবেস</h2>
+      <small>Enforcement &amp; Database</small>
+    </div>
+    <div class="grid">
+      <a href="https://script.google.com/macros/s/AKfycby1gloZBJfOWT8DsGTa4n2zw9tIJ20JXMG6bCbGs1xckzJAuirCZPWuP5p8nZvRbJBIGg/exec" target="_blank" class="card" data-t="SIM NID সার্চ পোর্টাল">
+        <div class="card-ico c-cyan"><i class="fas fa-sim-card"></i></div>
+        <div class="card-text">
+          <div class="card-title">SIM &amp; NID সার্চ পোর্টাল</div>
+          <div class="card-sub">Search by Mobile or NID number</div>
+        </div>
+        <span class="tag t-tl">App</span>
+      </a>
+      <a href="https://docs.google.com/spreadsheets/d/1eshpm1Iyk_5gcFasI4IOvyEwaEqx6K-X/edit?gid=1276624078#gid=1276624078" target="_blank" class="card" data-t="সকল অপারেটরের জরিমানার ডাটাবেস">
+        <div class="card-ico c-red"><i class="fas fa-gavel"></i></div>
+        <div class="card-text">
+          <div class="card-title">জরিমানার ডাটাবেস</div>
+          <div class="card-sub">All operators penalty database</div>
+        </div>
+        <span class="tag t-gy"><i class="fas fa-lock" style="font-size:.55rem;margin-right:2px"></i>Restricted</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Field Inspection -->
+  <div class="section">
+    <div class="sec-head">
+      <i class="fas fa-magnifying-glass-location"></i>
+      <h2>ফিল্ড ইন্সপেকশন</h2>
+      <small>Field Inspection</small>
+    </div>
+    <div class="grid">
+      <a href="https://docs.google.com/spreadsheets/d/1tX6MIJTtKWkREv21rO61oAk-1RTJFZolgHDsStPdKdY/edit?gid=0#gid=0" target="_blank" class="card" data-t="ফিল্ড ইন্সপেকশন ডেটা শিট">
+        <div class="card-ico c-green"><i class="fas fa-table"></i></div>
+        <div class="card-text">
+          <div class="card-title">ফিল্ড ইন্সপেকশন ডেটা শিট</div>
+          <div class="card-sub">Inspection records &amp; findings</div>
+        </div>
+        <span class="tag t-gy"><i class="fas fa-lock" style="font-size:.55rem;margin-right:2px"></i>Restricted</span>
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <i class="fas fa-shield-halved" style="color:#006a4e;margin-right:5px"></i>
+  Enforcement &amp; Inspection Directorate &nbsp;|&nbsp; BTRC &nbsp;|&nbsp; &copy; ২০২৬
+</footer>
+
+<script>
+  function filter() {
+    var q = document.getElementById('q').value.toLowerCase().trim();
+    document.querySelectorAll('.card').forEach(function(c) {
+      var show = !q || (c.getAttribute('data-t')||'').toLowerCase().includes(q) || c.textContent.toLowerCase().includes(q);
+      c.style.display = show ? 'flex' : 'none';
+    });
+    document.querySelectorAll('.section').forEach(function(s) {
+      var any = Array.from(s.querySelectorAll('.card')).some(function(c){ return c.style.display !== 'none'; });
+      s.style.display = (!q || any) ? '' : 'none';
+    });
+  }
+</script>
+</body>
+</html>
