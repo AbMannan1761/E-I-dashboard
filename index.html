@@ -614,7 +614,7 @@
       text-decoration: underline;
     }
 
-    /* Modal Dialogs (User Management, Change Pass, Viewer) */
+    /* Modal Dialogs (User Management, Change Pass) */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -800,47 +800,6 @@
       background: #f0f9ff;
     }
 
-    /* Embedded Secure Project Viewer Modal */
-    .viewer-modal {
-      position: fixed;
-      inset: 0;
-      background: #0f172a;
-      z-index: 1200;
-      display: none;
-      flex-direction: column;
-    }
-
-    .viewer-header {
-      background: #004d38;
-      color: #fff;
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    }
-
-    .viewer-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .viewer-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .viewer-frame {
-      flex: 1;
-      width: 100%;
-      border: none;
-      background: #fff;
-    }
-
     /* Animations */
     @keyframes fadeIn {
       from { opacity: 0; }
@@ -977,7 +936,7 @@
     <div class="card card-red" id="card-penalty" onclick="handleCardClick('penalty')">
       <div class="card-top">
         <div class="card-ico c-red"><i class="fas fa-gavel"></i></div>
-        <span class="tag t-rd" id="tag-penalty">Restricted</span>
+        <span class="tag t-rd" id="tag-penalty">Database</span>
       </div>
       <div class="card-body">
         <div class="card-title">প্রশাসনিক জরিমানার ডাটাবেজ</div>
@@ -993,7 +952,7 @@
     <div class="card card-green" id="card-inspection" onclick="handleCardClick('inspection')">
       <div class="card-top">
         <div class="card-ico c-green"><i class="fas fa-table"></i></div>
-        <span class="tag t-gr" id="tag-inspection">Restricted</span>
+        <span class="tag t-gr" id="tag-inspection">Archive</span>
       </div>
       <div class="card-body">
         <div class="card-title">ইএন্ডআই পরিদর্শন প্রতিবেদন আর্কাইভ</div>
@@ -1227,30 +1186,6 @@
 </div>
 
 <!-- ========================================================
-     5. SECURE IN-APP EMBEDDED PROJECT VIEWER
-     ======================================================== -->
-<div class="viewer-modal" id="secureViewer">
-  <div class="viewer-header">
-    <div class="viewer-title">
-      <i class="fas fa-shield-halved"></i>
-      <span id="viewerProjectTitle">প্রজেক্ট ভিউয়ার</span>
-    </div>
-    <div class="viewer-actions">
-      <button class="btn-header" onclick="openCurrentProjectInNewTab()" title="নতুন ট্যাবে ওপেন করুন">
-        <i class="fas fa-arrow-up-right-from-square"></i> আলাদা ট্যাব
-      </button>
-      <button class="btn-header" onclick="refreshViewer()" title="রিফ্রেশ">
-        <i class="fas fa-rotate-right"></i>
-      </button>
-      <button class="btn-header btn-logout" onclick="closeSecureViewer()" title="বন্ধ করুন">
-        <i class="fas fa-times"></i> বন্ধ করুন
-      </button>
-    </div>
-  </div>
-  <iframe id="viewerIframe" class="viewer-frame" src="about:blank" allow="fullscreen; clipboard-read; clipboard-write;"></iframe>
-</div>
-
-<!-- ========================================================
      CORE SECURITY, ENCRYPTION & RBAC ENGINE (JAVASCRIPT)
      ======================================================== -->
 <script>
@@ -1259,7 +1194,7 @@
    * 1. URL Obfuscation / Cipher Storage (No plain URLs in DOM)
    * 2. Role-Based Access Control (Admin, Director, Officer, Viewer)
    * 3. LocalStorage Persistence with Factory Defaults
-   * 4. Dynamic Decryption & In-App / Secure Redirection
+   * 4. Dynamic Decryption & Direct Secure Launch
    * 5. Interactive One-Click Permission Toggles
    */
 
@@ -1287,6 +1222,13 @@
     "sim": "সিম",
     "penalty": "জরিমানা",
     "inspection": "পরিদর্শন"
+  };
+
+  const DEFAULT_PROJECT_TAGS = {
+    "meeting": { text: "Portal", class: "t-bl" },
+    "sim": { text: "App", class: "t-tl" },
+    "penalty": { text: "Database", class: "t-rd" },
+    "inspection": { text: "Archive", class: "t-gr" }
   };
 
   const ALL_PROJECT_KEYS = ["meeting", "sim", "penalty", "inspection"];
@@ -1332,7 +1274,6 @@
 
   // Active state
   let currentUser = null;
-  let currentActiveProjectId = null;
 
   // Initialize System
   document.addEventListener("DOMContentLoaded", () => {
@@ -1440,9 +1381,10 @@
     // Notice update
     document.getElementById("accessNoticeText").textContent = `স্বাগতম, ${currentUser.name} (${currentUser.role.toUpperCase()})! আপনার অনুমোদিত প্রজেক্টসমূহ আনলক করা হয়েছে।`;
 
-    // Cards permission update
+    // Cards permission and tags update
     ALL_PROJECT_KEYS.forEach(pid => {
       const card = document.getElementById(`card-${pid}`);
+      const tag = document.getElementById(`tag-${pid}`);
       const isAllowed = currentUser.allowedProjects && currentUser.allowedProjects.includes(pid);
 
       if (isAllowed) {
@@ -1451,12 +1393,20 @@
         const actionIco = document.getElementById(`action-ico-${pid}`);
         if (actionSpan) actionSpan.textContent = "প্রবেশ করুন";
         if (actionIco) actionIco.className = "fas fa-arrow-right";
+        if (tag) {
+          tag.className = `tag ${DEFAULT_PROJECT_TAGS[pid].class}`;
+          tag.textContent = DEFAULT_PROJECT_TAGS[pid].text;
+        }
       } else {
         card.classList.add("locked");
         const actionSpan = document.getElementById(`action-text-${pid}`);
         const actionIco = document.getElementById(`action-ico-${pid}`);
         if (actionSpan) actionSpan.textContent = "অনুমতি নেই (লকড)";
         if (actionIco) actionIco.className = "fas fa-lock";
+        if (tag) {
+          tag.className = "tag t-gy";
+          tag.innerHTML = `<i class="fas fa-lock" style="font-size:0.6rem"></i> Restricted`;
+        }
       }
     });
   }
@@ -1494,44 +1444,8 @@
       return;
     }
 
-    currentActiveProjectId = projectId;
-    
-    // Open in Secure In-App Viewer
-    openSecureViewer(projectId, targetUrl);
-  }
-
-  // Viewer Controls
-  function openSecureViewer(projectId, url) {
-    const viewer = document.getElementById("secureViewer");
-    const frame = document.getElementById("viewerIframe");
-    const title = document.getElementById("viewerProjectTitle");
-
-    title.textContent = PROJECT_TITLES[projectId] || "প্রজেক্ট ভিউয়ার";
-    frame.src = url;
-    viewer.style.display = "flex";
-  }
-
-  function closeSecureViewer() {
-    const viewer = document.getElementById("secureViewer");
-    const frame = document.getElementById("viewerIframe");
-    frame.src = "about:blank";
-    viewer.style.display = "none";
-  }
-
-  function refreshViewer() {
-    const frame = document.getElementById("viewerIframe");
-    if (frame.src && frame.src !== "about:blank") {
-      frame.src = frame.src;
-    }
-  }
-
-  function openCurrentProjectInNewTab() {
-    if (currentActiveProjectId && CIPHER_STORE[currentActiveProjectId]) {
-      const url = decryptUrl(CIPHER_STORE[currentActiveProjectId]);
-      if (url) {
-        window.open(url, "_blank", "noopener,noreferrer");
-      }
-    }
+    // Direct Secure Launch in New Tab (Bypasses Google Apps Script iframe blocking)
+    window.open(targetUrl, "_blank", "noopener,noreferrer");
   }
 
   // Logout
@@ -1540,7 +1454,6 @@
       currentUser = null;
       sessionStorage.removeItem(STORAGE_KEY_SESSION);
       localStorage.removeItem(STORAGE_KEY_SESSION);
-      closeSecureViewer();
       showLoginOverlay();
     }
   }
