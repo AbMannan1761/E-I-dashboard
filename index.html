@@ -630,9 +630,9 @@
     .modal-box {
       background: #fff;
       border-radius: 18px;
-      max-width: 780px;
+      max-width: 820px;
       width: 100%;
-      max-height: 90vh;
+      max-height: 92vh;
       display: flex;
       flex-direction: column;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
@@ -693,7 +693,7 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 0.85rem;
-      margin-top: 1rem;
+      margin-top: 0.75rem;
     }
 
     .user-table th {
@@ -706,13 +706,62 @@
     }
 
     .user-table td {
-      padding: 10px 12px;
+      padding: 11px 12px;
       border-bottom: 1px solid #f1f5f9;
       vertical-align: middle;
     }
 
     .user-table tr:hover td {
       background: #f8fafc;
+    }
+
+    /* Clickable Access Permission Toggles */
+    .perm-toggle-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .perm-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+      border: 1px solid transparent;
+    }
+
+    .perm-pill.active {
+      background: #ecfdf5;
+      color: #047857;
+      border-color: #a7f3d0;
+    }
+
+    .perm-pill.active:hover {
+      background: #fee2e2;
+      color: #dc2626;
+      border-color: #fca5a5;
+      text-decoration: line-through;
+    }
+
+    .perm-pill.inactive {
+      background: #f1f5f9;
+      color: #94a3b8;
+      border-color: #cbd5e1;
+      opacity: 0.75;
+    }
+
+    .perm-pill.inactive:hover {
+      background: #eff6ff;
+      color: #2563eb;
+      border-color: #93c5fd;
+      opacity: 1;
     }
 
     .btn-action-sm {
@@ -1033,33 +1082,61 @@
         <h4 style="font-size:0.92rem; font-weight:700; color:#1e293b; margin-bottom:0.75rem; display:flex; align-items:center; gap:6px;">
           <i class="fas fa-user-plus" style="color:#006a4e"></i> নতুন ইউজার তৈরি করুন
         </h4>
-        <form onsubmit="event.preventDefault(); handleAddNewUser();" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) 120px; gap:0.75rem; align-items:end;">
-          <div class="form-group">
-            <label style="font-size:0.78rem;">ইউজারনেম</label>
-            <input type="text" id="newUsername" placeholder="যেমন: officer2" required style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem;" />
+        <form onsubmit="event.preventDefault(); handleAddNewUser();">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) 120px; gap:0.75rem; align-items:end;">
+            <div class="form-group">
+              <label style="font-size:0.78rem;">ইউজারনেম</label>
+              <input type="text" id="newUsername" placeholder="যেমন: officer2" required style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem;" />
+            </div>
+            <div class="form-group">
+              <label style="font-size:0.78rem;">পাসওয়ার্ড</label>
+              <input type="text" id="newPassword" placeholder="পাসওয়ার্ড দিন" required style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem;" />
+            </div>
+            <div class="form-group">
+              <label style="font-size:0.78rem;">রোল / পদবী</label>
+              <select id="newRole" onchange="onRoleDropdownChange()" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem;">
+                <option value="admin">Admin (Full Access + Manage)</option>
+                <option value="director">Director (All Portals)</option>
+                <option value="officer" selected>Officer (Custom Access)</option>
+                <option value="viewer">Viewer (Only Meeting)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-auth-submit" style="margin:0; padding:8px 12px; font-size:0.85rem;">
+              <i class="fas fa-plus"></i> যোগ করুন
+            </button>
           </div>
-          <div class="form-group">
-            <label style="font-size:0.78rem;">পাসওয়ার্ড</label>
-            <input type="text" id="newPassword" placeholder="পাসওয়ার্ড দিন" required style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem;" />
+
+          <!-- Permissions Checkboxes for New User -->
+          <div style="margin-top:0.85rem; padding-top:0.75rem; border-top:1px dashed #cbd5e1;">
+            <label style="font-size:0.78rem; font-weight:700; color:#334155; display:block; margin-bottom:6px;">
+              <i class="fas fa-key" style="color:#006a4e"></i> কোন কোন পোর্টালে এক্সেস পাবে? (টিক দিন):
+            </label>
+            <div style="display:flex; gap:16px; flex-wrap:wrap; font-size:0.82rem; color:#1e293b;">
+              <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                <input type="checkbox" id="perm_meeting" checked /> সভা সিদ্ধান্ত
+              </label>
+              <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                <input type="checkbox" id="perm_sim" checked /> সিম ডাটাবেজ
+              </label>
+              <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                <input type="checkbox" id="perm_penalty" checked /> জরিমানা ডাটাবেজ
+              </label>
+              <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                <input type="checkbox" id="perm_inspection" checked /> পরিদর্শন হাব
+              </label>
+            </div>
           </div>
-          <div class="form-group">
-            <label style="font-size:0.78rem;">রোল / পদবী</label>
-            <select id="newRole" style="padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem;">
-              <option value="admin">Admin (Full Access + Manage)</option>
-              <option value="director">Director (All Portals)</option>
-              <option value="officer" selected>Officer (All Portals)</option>
-              <option value="viewer">Viewer (Only Meeting Portal)</option>
-            </select>
-          </div>
-          <button type="submit" class="btn-auth-submit" style="margin:0; padding:8px 12px; font-size:0.85rem;">
-            <i class="fas fa-plus"></i> যোগ করুন
-          </button>
         </form>
       </div>
 
       <!-- Users List -->
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-        <h4 style="font-size:0.95rem; font-weight:700; color:#0f172a;">বর্তমান সক্রিয় ব্যবহারকারী তালিকা</h4>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem; flex-wrap:wrap; gap:8px;">
+        <div>
+          <h4 style="font-size:0.95rem; font-weight:700; color:#0f172a;">বর্তমান সক্রিয় ব্যবহারকারী তালিকা</h4>
+          <span style="font-size:0.75rem; color:#64748b;">
+            💡 <strong>টিপস:</strong> 'এক্সেস অনুমতি' কলামের যেকোনো বাটনে ক্লিক করে সাথে সাথে ওই পোর্টালে পারমিশন <strong>চালু (On)</strong> বা <strong>বন্ধ (Off)</strong> করুন।
+          </span>
+        </div>
         <button class="btn-action-sm" onclick="resetUsersToDefault()" title="ডিফল্ট তালিকায় ফিরিয়ে নিন">
           <i class="fas fa-rotate-left"></i> ফ্যাক্টরি রিসেট
         </button>
@@ -1071,8 +1148,8 @@
             <tr>
               <th>ইউজারনেম</th>
               <th>রোল</th>
-              <th>এক্সেস অনুমতি</th>
-              <th>অ্যাকশন (পাসওয়ার্ড রিসেট)</th>
+              <th>এক্সেস অনুমতি (ক্লিক করে পরিবর্তন করুন)</th>
+              <th>অ্যাকশন</th>
             </tr>
           </thead>
           <tbody id="userTableBody">
@@ -1183,6 +1260,7 @@
    * 2. Role-Based Access Control (Admin, Director, Officer, Viewer)
    * 3. LocalStorage Persistence with Factory Defaults
    * 4. Dynamic Decryption & In-App / Secure Redirection
+   * 5. Interactive One-Click Permission Toggles
    */
 
   // 1. OBFUSCATED / ENCRYPTED TARGET PROJECT PAYLOADS
@@ -1203,6 +1281,15 @@
     "penalty": "প্রশাসনিক জরিমানার ডাটাবেজ",
     "inspection": "ইএন্ডআই পরিদর্শন প্রতিবেদন আর্কাইভ"
   };
+
+  const PROJECT_LABELS = {
+    "meeting": "মিটিং",
+    "sim": "সিম",
+    "penalty": "জরিমানা",
+    "inspection": "পরিদর্শন"
+  };
+
+  const ALL_PROJECT_KEYS = ["meeting", "sim", "penalty", "inspection"];
 
   // Master recovery key for emergency administrative resets
   const MASTER_RECOVERY_KEY = "BTRC-EI-2026";
@@ -1354,8 +1441,7 @@
     document.getElementById("accessNoticeText").textContent = `স্বাগতম, ${currentUser.name} (${currentUser.role.toUpperCase()})! আপনার অনুমোদিত প্রজেক্টসমূহ আনলক করা হয়েছে।`;
 
     // Cards permission update
-    const allProjects = ["meeting", "sim", "penalty", "inspection"];
-    allProjects.forEach(pid => {
+    ALL_PROJECT_KEYS.forEach(pid => {
       const card = document.getElementById(`card-${pid}`);
       const isAllowed = currentUser.allowedProjects && currentUser.allowedProjects.includes(pid);
 
@@ -1491,17 +1577,35 @@
     openModal("adminModal");
   }
 
+  // Render User Table with Clickable Permission Toggles
   function renderUsersTable() {
     const tbody = document.getElementById("userTableBody");
     const users = getUsersDB();
     tbody.innerHTML = "";
 
-    users.forEach((user, idx) => {
+    users.forEach((user) => {
       const tr = document.createElement("tr");
       const isSelf = user.username.toLowerCase() === currentUser.username.toLowerCase();
       
-      const permissionsBadge = (user.allowedProjects || []).map(p => {
-        return `<span style="font-size:0.7rem; background:#f1f5f9; border:1px solid #cbd5e1; padding:2px 5px; border-radius:4px; margin-right:3px;">${p}</span>`;
+      const userProjects = user.allowedProjects || [];
+
+      // Generate Clickable Toggles for each of the 4 projects
+      const togglesHtml = ALL_PROJECT_KEYS.map(pKey => {
+        const isGranted = userProjects.includes(pKey);
+        const label = PROJECT_LABELS[pKey] || pKey;
+        if (isGranted) {
+          return `
+            <span class="perm-pill active" onclick="toggleUserProject('${user.username}', '${pKey}')" title="ক্লিক করলে '${label}' এক্সেস বন্ধ হবে">
+              <i class="fas fa-check"></i> ${label}
+            </span>
+          `;
+        } else {
+          return `
+            <span class="perm-pill inactive" onclick="toggleUserProject('${user.username}', '${pKey}')" title="ক্লিক করলে '${label}' এক্সেস চালু হবে">
+              <i class="fas fa-plus"></i> ${label}
+            </span>
+          `;
+        }
       }).join("");
 
       tr.innerHTML = `
@@ -1513,7 +1617,9 @@
           <span class="role-badge ${user.role}">${user.role}</span>
         </td>
         <td>
-          ${permissionsBadge}
+          <div class="perm-toggle-group">
+            ${togglesHtml}
+          </div>
         </td>
         <td>
           <div style="display:flex; gap:6px;">
@@ -1532,6 +1638,44 @@
     });
   }
 
+  // One-Click Toggle Permission Function
+  function toggleUserProject(targetUsername, projectId) {
+    let users = getUsersDB();
+    const user = users.find(u => u.username.toLowerCase() === targetUsername.toLowerCase());
+    if (!user) return;
+
+    if (!user.allowedProjects) user.allowedProjects = [];
+
+    const index = user.allowedProjects.indexOf(projectId);
+    if (index > -1) {
+      user.allowedProjects.splice(index, 1);
+    } else {
+      user.allowedProjects.push(projectId);
+    }
+
+    saveUsersDB(users);
+
+    // If currently logged in user is being modified, update live session
+    if (currentUser && currentUser.username.toLowerCase() === targetUsername.toLowerCase()) {
+      currentUser = user;
+      sessionStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(currentUser));
+      localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(currentUser));
+      applyAuthenticatedUI();
+    }
+
+    renderUsersTable();
+  }
+
+  // Sync Checkboxes when Role changes in Add User Form
+  function onRoleDropdownChange() {
+    const role = document.getElementById("newRole").value;
+    const isFull = (role === 'admin' || role === 'director' || role === 'officer');
+    document.getElementById("perm_meeting").checked = true;
+    document.getElementById("perm_sim").checked = isFull;
+    document.getElementById("perm_penalty").checked = isFull;
+    document.getElementById("perm_inspection").checked = isFull;
+  }
+
   // Admin: Add New User
   function handleAddNewUser() {
     const username = document.getElementById("newUsername").value.trim().toLowerCase();
@@ -1546,10 +1690,12 @@
       return;
     }
 
-    let allowed = ["meeting"];
-    if (role === 'admin' || role === 'director' || role === 'officer') {
-      allowed = ["meeting", "sim", "penalty", "inspection"];
-    }
+    // Collect custom allowed projects from checkboxes
+    const allowed = [];
+    if (document.getElementById("perm_meeting").checked) allowed.push("meeting");
+    if (document.getElementById("perm_sim").checked) allowed.push("sim");
+    if (document.getElementById("perm_penalty").checked) allowed.push("penalty");
+    if (document.getElementById("perm_inspection").checked) allowed.push("inspection");
 
     const newUser = {
       username: username,
