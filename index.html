@@ -947,7 +947,7 @@
 
 <main>
   <!-- Welcome / Role access notice -->
-  <div class="access-notice" id="accessNotice">
+  <div class="access-notice" id="accessNotice" style="display:none;">
     <div style="display:flex; align-items:center; gap:8px;">
       <i class="fas fa-shield-alt" style="color:#2563eb; font-size:1.1rem;"></i>
       <span id="accessNoticeText">আপনার রোল অনুযায়ী অনুমোদিত ডেটাবেজ ও পোর্টালসমূহের তালিকা নিচে দেওয়া হলো।</span>
@@ -1038,7 +1038,7 @@
 <!-- ========================================================
      1. LOGIN OVERLAY MODAL
      ======================================================== -->
-<div class="auth-overlay" id="authOverlay">
+<div class="auth-overlay" id="authOverlay" style="display:none;">
   <div class="auth-card">
     <div class="auth-header-ico">
       <i class="fas fa-shield-halved"></i>
@@ -1268,6 +1268,14 @@
    * 5. Interactive One-Click Permission Toggles
    */
 
+  // ========================================================
+  // SYSTEM ACCESS & AUTHENTICATION MODE
+  // true  = পাসওয়ার্ড ও ইউজার রোল সিস্টেম সক্রিয় (লগইন আবশ্যক)
+  // false = পাসওয়ার্ড ছাড়া উন্মুক্ত মোড (সকলের জন্য সরাসরি এক্সেস)
+  // (রবিবার পাসওয়ার্ড চালু করতে চাইলে এটিকে true করে দিলেই হবে)
+  // ========================================================
+  const AUTH_ENABLED = false;
+
   // 1. OBFUSCATED / ENCRYPTED TARGET PROJECT PAYLOADS
   const CIPHER_STORE = {
     // btrc-meeting-portal
@@ -1372,8 +1380,34 @@
     localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
   }
 
-  // Session Check
+  // Session & Access Mode Check
   function checkSession() {
+    if (!AUTH_ENABLED) {
+      // Open mode: Hide login modal, header auth bar & notice banner
+      const overlay = document.getElementById("authOverlay");
+      if (overlay) overlay.style.display = "none";
+      const headerBar = document.getElementById("headerAuthBar");
+      if (headerBar) headerBar.style.display = "none";
+      const notice = document.getElementById("accessNotice");
+      if (notice) notice.style.display = "none";
+
+      // Unlock all 4 cards for universal access
+      ALL_PROJECT_KEYS.forEach(pid => {
+        const card = document.getElementById(`card-${pid}`);
+        const tag = document.getElementById(`tag-${pid}`);
+        if (card) card.classList.remove("locked");
+        const actionSpan = document.getElementById(`action-text-${pid}`);
+        const actionIco = document.getElementById(`action-ico-${pid}`);
+        if (actionSpan) actionSpan.textContent = "প্রবেশ করুন";
+        if (actionIco) actionIco.className = "fas fa-arrow-right";
+        if (tag && DEFAULT_PROJECT_TAGS[pid]) {
+          tag.className = `tag ${DEFAULT_PROJECT_TAGS[pid].class}`;
+          tag.textContent = DEFAULT_PROJECT_TAGS[pid].text;
+        }
+      });
+      return;
+    }
+
     const session = localStorage.getItem(STORAGE_KEY_SESSION) || sessionStorage.getItem(STORAGE_KEY_SESSION);
     if (session) {
       try {
@@ -1393,6 +1427,7 @@
   }
 
   function showLoginOverlay() {
+    if (!AUTH_ENABLED) return;
     document.getElementById("authOverlay").style.display = "flex";
     document.getElementById("headerAuthBar").style.display = "none";
     document.getElementById("accessNotice").style.display = "none";
@@ -1400,8 +1435,13 @@
 
   function hideLoginOverlay() {
     document.getElementById("authOverlay").style.display = "none";
-    document.getElementById("headerAuthBar").style.display = "flex";
-    document.getElementById("accessNotice").style.display = "flex";
+    if (AUTH_ENABLED) {
+      document.getElementById("headerAuthBar").style.display = "flex";
+      document.getElementById("accessNotice").style.display = "flex";
+    } else {
+      document.getElementById("headerAuthBar").style.display = "none";
+      document.getElementById("accessNotice").style.display = "none";
+    }
   }
 
   // Handle Login
@@ -1516,15 +1556,17 @@
   }
 
   function showCardContextMenu(e, projectId) {
-    if (!currentUser) {
+    if (AUTH_ENABLED && !currentUser) {
       showLoginOverlay();
       return;
     }
 
-    const isAllowed = currentUser.allowedProjects && currentUser.allowedProjects.includes(projectId);
-    if (!isAllowed) {
-      alert(`⚠️ দুঃখিত! '${PROJECT_TITLES[projectId]}' পোর্টালে আপনার প্রবেশের অনুমতি নেই।`);
-      return;
+    if (AUTH_ENABLED && currentUser) {
+      const isAllowed = currentUser.allowedProjects && currentUser.allowedProjects.includes(projectId);
+      if (!isAllowed) {
+        alert(`⚠️ দুঃখিত! '${PROJECT_TITLES[projectId]}' পোর্টালে আপনার প্রবেশের অনুমতি নেই।`);
+        return;
+      }
     }
 
     contextTargetProjectId = projectId;
@@ -1560,15 +1602,17 @@
   }
 
   function handleCardClick(projectId, event) {
-    if (!currentUser) {
+    if (AUTH_ENABLED && !currentUser) {
       showLoginOverlay();
       return;
     }
 
-    const isAllowed = currentUser.allowedProjects && currentUser.allowedProjects.includes(projectId);
-    if (!isAllowed) {
-      alert(`⚠️ দুঃখিত! '${PROJECT_TITLES[projectId]}' পোর্টালে আপনার প্রবেশের অনুমতি নেই।\nপ্রয়োজনে অ্যাডমিনের সাথে যোগাযোগ করুন।`);
-      return;
+    if (AUTH_ENABLED && currentUser) {
+      const isAllowed = currentUser.allowedProjects && currentUser.allowedProjects.includes(projectId);
+      if (!isAllowed) {
+        alert(`⚠️ দুঃখিত! '${PROJECT_TITLES[projectId]}' পোর্টালে আপনার প্রবেশের অনুমতি নেই।\nপ্রয়োজনে অ্যাডমিনের সাথে যোগাযোগ করুন।`);
+        return;
+      }
     }
 
     const cipher = CIPHER_STORE[projectId];
