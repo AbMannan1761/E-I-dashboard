@@ -614,6 +614,53 @@
       text-decoration: underline;
     }
 
+    /* Embedded Secure Project Viewer Modal (Same Tab View) */
+    .viewer-modal {
+      position: fixed;
+      inset: 0;
+      background: #0f172a;
+      z-index: 1200;
+      display: none;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .viewer-header {
+      background: #004d38;
+      color: #fff;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .viewer-title {
+      font-size: 0.96rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+    }
+
+    .viewer-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .viewer-frame {
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 54px);
+      border: none;
+      background: #fff;
+    }
+
     /* Modal Dialogs (User Management, Change Pass) */
     .modal-backdrop {
       position: fixed;
@@ -1186,6 +1233,30 @@
 </div>
 
 <!-- ========================================================
+     5. SECURE IN-APP EMBEDDED PROJECT VIEWER (SAME TAB)
+     ======================================================== -->
+<div class="viewer-modal" id="secureViewer">
+  <div class="viewer-header">
+    <div class="viewer-title">
+      <i class="fas fa-shield-halved"></i>
+      <span id="viewerProjectTitle">প্রজেক্ট ভিউয়ার</span>
+    </div>
+    <div class="viewer-actions">
+      <button class="btn-header" onclick="openCurrentProjectInNewTab()" title="নতুন ট্যাবে ওপেন করতে চাইলে">
+        <i class="fas fa-arrow-up-right-from-square"></i> আলাদা ট্যাব
+      </button>
+      <button class="btn-header" onclick="refreshViewer()" title="রিফ্রেশ">
+        <i class="fas fa-rotate-right"></i> রিফ্রেশ
+      </button>
+      <button class="btn-header btn-logout" onclick="closeSecureViewer()" title="ড্যাশবোর্ডে ফিরে যান">
+        <i class="fas fa-times"></i> বন্ধ করুন
+      </button>
+    </div>
+  </div>
+  <iframe id="viewerIframe" class="viewer-frame" src="about:blank" allow="fullscreen; clipboard-read; clipboard-write; geolocation; microphone; camera;"></iframe>
+</div>
+
+<!-- ========================================================
      CORE SECURITY, ENCRYPTION & RBAC ENGINE (JAVASCRIPT)
      ======================================================== -->
 <script>
@@ -1421,6 +1492,8 @@
     }
   }
 
+  let currentActiveProjectId = null;
+
   function handleCardClick(projectId) {
     if (!currentUser) {
       showLoginOverlay();
@@ -1445,8 +1518,43 @@
       return;
     }
 
-    // Direct Secure Launch in New Tab (Bypasses Google Apps Script iframe blocking)
-    window.open(targetUrl, "_blank", "noopener,noreferrer");
+    currentActiveProjectId = projectId;
+
+    // Open inside the same tab in Secure In-App Viewer
+    openSecureViewer(projectId, targetUrl);
+  }
+
+  function openSecureViewer(projectId, url) {
+    const viewer = document.getElementById("secureViewer");
+    const frame = document.getElementById("viewerIframe");
+    const title = document.getElementById("viewerProjectTitle");
+
+    title.textContent = PROJECT_TITLES[projectId] || "প্রজেক্ট ভিউয়ার";
+    frame.src = url;
+    viewer.style.display = "flex";
+  }
+
+  function closeSecureViewer() {
+    const viewer = document.getElementById("secureViewer");
+    const frame = document.getElementById("viewerIframe");
+    frame.src = "about:blank";
+    viewer.style.display = "none";
+  }
+
+  function refreshViewer() {
+    const frame = document.getElementById("viewerIframe");
+    if (frame.src && frame.src !== "about:blank") {
+      frame.src = frame.src;
+    }
+  }
+
+  function openCurrentProjectInNewTab() {
+    if (currentActiveProjectId && CIPHER_STORE[currentActiveProjectId]) {
+      const url = decryptUrl(CIPHER_STORE[currentActiveProjectId]);
+      if (url) {
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+    }
   }
 
   // Logout
